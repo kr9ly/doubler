@@ -1,12 +1,12 @@
-package net.kr9ly.doubler.component;
+package net.kr9ly.doubler.providers;
 
-import dagger.Component;
-import net.kr9ly.doubler.injectors.SampleInjectorsSupport;
-import net.kr9ly.doubler.module.SampleModule;
-import net.kr9ly.doubler.module.SampleModuleSupport;
-import net.kr9ly.doubler.providers.SampleProvidersModule;
-import net.kr9ly.doubler.providers.SampleProvidersModuleSupport;
+import net.kr9ly.doubler.ProvidersSupport;
 import net.kr9ly.doubler.scope.SampleScope;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Copyright 2015 kr9ly
@@ -24,6 +24,8 @@ import net.kr9ly.doubler.scope.SampleScope;
  * limitations under the License.
  */
 @SampleScope
-@Component(modules = {SampleModule.class, SampleProvidersModule.class})
-public interface SampleComponent extends SampleModuleSupport, SampleInjectorsSupport, SampleProvidersModuleSupport {
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
+@ProvidersSupport
+public @interface SampleProviders {
 }

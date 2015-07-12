@@ -1,12 +1,8 @@
-package net.kr9ly.doubler.component;
+package net.kr9ly.doubler.repository;
 
-import dagger.Component;
-import net.kr9ly.doubler.injectors.SampleInjectorsSupport;
-import net.kr9ly.doubler.module.SampleModule;
-import net.kr9ly.doubler.module.SampleModuleSupport;
-import net.kr9ly.doubler.providers.SampleProvidersModule;
-import net.kr9ly.doubler.providers.SampleProvidersModuleSupport;
-import net.kr9ly.doubler.scope.SampleScope;
+import net.kr9ly.doubler.providers.SampleProviders;
+
+import javax.inject.Inject;
 
 /**
  * Copyright 2015 kr9ly
@@ -23,7 +19,13 @@ import net.kr9ly.doubler.scope.SampleScope;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@SampleScope
-@Component(modules = {SampleModule.class, SampleProvidersModule.class})
-public interface SampleComponent extends SampleModuleSupport, SampleInjectorsSupport, SampleProvidersModuleSupport {
+@SampleProviders
+public class SampleDependentRepository {
+
+    @Inject
+    SampleRepository sampleRepository;
+
+    public String getDependentString() {
+        return sampleRepository.getString() + "_dependent";
+    }
 }

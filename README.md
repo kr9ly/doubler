@@ -13,7 +13,7 @@ maven { url 'http://kr9ly.github.io/maven/' }
 And Add this to `dependencies` block in your build.gradle
 
 ```
-apt 'net.kr9ly:doubler:0.0.1'
+apt 'net.kr9ly:doubler:0.0.2'
 ```
 
 ### Auto Module Expose Support
@@ -61,10 +61,72 @@ public class SampleModel {
 ```
 
 ```java
-@Component(modules = {SampleModule.class})
+@dagger.Component(modules = {SampleModule.class})
 public interface SampleComponent extends SampleInjectorsSupport {
     // this method contained within SampleInjectorsSupport(Auto-Generated).
     // void inject(SampleModel injectTo);
+}
+```
+### Module Generation Support
+
+```java
+@SampleScope
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
+@net.kr9ly.doubler.ProvidersSupport
+public @interface SampleProviders {
+}
+```
+
+```java
+@SampleProviders
+public class SampleDependentRepository {
+
+    // field injection
+    @javax.inject.Inject
+    SampleRepository sampleRepository;
+
+    public String getDependentString() {
+        return sampleRepository.getString() + "_dependent";
+    }
+}
+```
+
+```java
+@SampleProviders
+public class SampleDependentAssistedRepository {
+
+    private SampleDependentRepository sampleDependentRepository;
+
+    private String suffix;
+
+    // constructor injection
+    @javax.inject.Inject
+    public SampleDependentAssistedRepository(
+            SampleDependentRepository sampleDependentRepository,
+            // support assisted injection
+            @net.kr9ly.doubler.Assisted String suffix
+    ) {
+        this.sampleDependentRepository = sampleDependentRepository;
+        this.suffix = suffix;
+    }
+
+    public String getDependentAssistedString() {
+        return sampleDependentRepository.getDependentString() + suffix;
+    }
+}
+```
+
+```java
+@SampleScope
+@dagger.Component(modules = {SampleProvidersModule.class})
+public interface SampleComponent extends SampleProvidersModuleSupport {
+    // this method contained within SampleProvidersModuleSupport(Auto-Generated).
+    SampleDependentRepository sampleDependentRepository();
+    // you can inject Builder Class(Auto-Injected) also
+    SampleDependentRepositoryBuilder sampleDependentRepositoryBuilder();
+    // use SampleDependentAssistedRepositoryBuilder#build(String suffix) to get instance
+    SampleDependentAssistedRepositoryBuilder sampleDependentAssistedRepositoryBuilder();
 }
 ```
 

@@ -5,7 +5,7 @@ apply plugin: 'maven'
 sourceCompatibility = 1.6
 group = "net.kr9ly"
 archivesBaseName = "doubler"
-version = '0.0.1'
+version = '0.0.2'
 
 
 ext {
@@ -53,6 +53,7 @@ uploadArchives {
 
 idea {
     module {
+        testSourceDirs += generatedSourcesDir
         generatedSourceDirs += generatedSourcesDir
         excludeDirs = [
                 file("${projectDir}/build/classes"),

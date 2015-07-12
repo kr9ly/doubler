@@ -1,6 +1,8 @@
 package net.kr9ly.doubler;
 
 import net.kr9ly.doubler.injectors.SampleInjectors;
+import net.kr9ly.doubler.repository.SampleDependentAssistedRepositoryBuilder;
+import net.kr9ly.doubler.repository.SampleDependentRepository;
 import net.kr9ly.doubler.repository.SampleRepository;
 
 import javax.inject.Inject;
@@ -26,7 +28,21 @@ public class SampleModel {
     @Inject
     SampleRepository sampleRepository;
 
+    @Inject
+    SampleDependentRepository sampleDependentRepository;
+
+    @Inject
+    SampleDependentAssistedRepositoryBuilder sampleDependentAssistedRepositoryBuilder;
+
     public String getString() {
         return sampleRepository.getString();
+    }
+
+    public String getDependentString() {
+        return sampleDependentRepository.getDependentString();
+    }
+
+    public String getDependentAssistedString() {
+        return sampleDependentAssistedRepositoryBuilder.build("_suffix").getDependentAssistedString();
     }
 }

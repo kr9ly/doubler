@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Copyright 2015 kr9ly
@@ -37,5 +37,7 @@ public class DoublerProcessorTest {
         component.inject(sampleModel);
 
         assertEquals("sample", sampleModel.getString());
+        assertEquals("sample_dependent", sampleModel.getDependentString());
+        assertEquals("sample_dependent_suffix", sampleModel.getDependentAssistedString());
     }
 }
