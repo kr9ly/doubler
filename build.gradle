@@ -1,0 +1,67 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.6
+group = "net.kr9ly"
+archivesBaseName = "doubler"
+version = '0.0.1'
+
+
+ext {
+    mavenRepository = getProperty("maven.repopath")
+    generatedSourcesDir = file("${buildDir}/generated/java")
+}
+
+configurations {
+    testProvided
+}
+
+sourceSets {
+    test {
+        compileClasspath += configurations.testProvided
+    }
+}
+
+compileTestJava {
+    doFirst {
+        generatedSourcesDir.mkdirs()
+    }
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-source', '1.6', '-target', '1.6', '-s', generatedSourcesDir]
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.squareup:javapoet:1.1.0'
+    compile 'com.google.dagger:dagger:2.0'
+    compile 'com.google.auto.service:auto-service:1.0-rc2'
+    testProvided 'com.google.dagger:dagger-compiler:2.0'
+    testCompile 'junit:junit:4.11'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri(mavenRepository))
+        }
+    }
+}
+
+idea {
+    module {
+        generatedSourceDirs += generatedSourcesDir
+        excludeDirs = [
+                file("${projectDir}/build/classes"),
+                file("${projectDir}/build/reports"),
+                file("${projectDir}/build/resources"),
+                file("${projectDir}/build/test-results"),
+                file("${projectDir}/build/tmp"),
+                file("${projectDir}/build/dependency-cache"),
+        ]
+        scopes.TEST.plus += [configurations.testProvided]
+    }
+}
