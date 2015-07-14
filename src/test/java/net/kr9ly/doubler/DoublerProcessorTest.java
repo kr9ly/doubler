@@ -2,6 +2,7 @@ package net.kr9ly.doubler;
 
 import net.kr9ly.doubler.component.DaggerSampleComponent;
 import net.kr9ly.doubler.component.SampleComponent;
+import net.kr9ly.doubler.injectors.SampleInjectorsSupportHelper;
 import net.kr9ly.doubler.module.SampleModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,10 +35,14 @@ public class DoublerProcessorTest {
                 .build();
 
         SampleModel sampleModel = new SampleModel();
-        component.inject(sampleModel);
+        SampleModel2 sampleModel2 = new SampleModel2();
+
+        SampleInjectorsSupportHelper.inject(component, sampleModel);
+        SampleInjectorsSupportHelper.inject(component, sampleModel2);
 
         assertEquals("sample", sampleModel.getString());
         assertEquals("sample_dependent", sampleModel.getDependentString());
         assertEquals("sample_dependent_suffix", sampleModel.getDependentAssistedString());
+        assertEquals("sample", sampleModel2.getString());
     }
 }

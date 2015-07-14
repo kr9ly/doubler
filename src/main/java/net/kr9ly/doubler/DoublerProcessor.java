@@ -77,10 +77,22 @@ public class DoublerProcessor extends AbstractProcessor {
     private void generateInjectorsComponents(RoundEnvironment roundEnv) {
         Set<? extends Element> injectorsElements = roundEnv.getElementsAnnotatedWith(InjectorsSupport.class);
         for (Element injectorsElement : injectorsElements) {
-            TypeSpec.Builder supportBuilder = TypeSpec.interfaceBuilder(toSupportName(injectorsElement))
+            ClassName supportName = ClassName.bestGuess(getPackageName(injectorsElement) + "." + toSupportName(injectorsElement));
+
+            TypeSpec.Builder supportBuilder = TypeSpec.interfaceBuilder(supportName.simpleName())
                     .addAnnotation(getGeneratedAnnotation())
                     .addModifiers(Modifier.PUBLIC);
 
+            TypeSpec.Builder supportHelperBuilder = TypeSpec.classBuilder(toSupportHelperName(injectorsElement))
+                    .addAnnotation(getGeneratedAnnotation())
+                    .addModifiers(Modifier.PUBLIC);
+
+            MethodSpec.Builder supportHelperInjectBuilder = MethodSpec.methodBuilder("inject")
+                    .addModifiers(Modifier.STATIC, Modifier.PUBLIC);
+
+            CodeBlock.Builder supportHelperInjectCodeBlockBuilder = CodeBlock.builder();
+
+            boolean isFirst = true;
             Set<? extends Element> injectClasses = roundEnv.getElementsAnnotatedWith((TypeElement) injectorsElement);
             for (Element injectClass : injectClasses) {
                 MethodSpec injectMethod = MethodSpec.methodBuilder("inject")
@@ -88,13 +100,41 @@ public class DoublerProcessor extends AbstractProcessor {
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .build();
                 supportBuilder.addMethod(injectMethod);
+
+
+                if (isFirst) {
+                    supportHelperInjectCodeBlockBuilder
+                            .beginControlFlow("if (injectTo instanceof $T)", injectClass);
+                    isFirst = false;
+                } else {
+                    supportHelperInjectCodeBlockBuilder
+                            .nextControlFlow("else if (injectTo instanceof $T)", injectClass);
+                }
+                supportHelperInjectCodeBlockBuilder
+                        .addStatement("component.inject(($T) injectTo)", injectClass);
             }
+
+            CodeBlock supportHelperInjectCodeBlock = supportHelperInjectCodeBlockBuilder
+                    .endControlFlow()
+                    .build();
+
+            MethodSpec supportHelperInject = supportHelperInjectBuilder
+                    .addParameter(supportName.box(), "component")
+                    .addParameter(Object.class, "injectTo")
+                    .addCode(supportHelperInjectCodeBlock)
+                    .build();
+
+            supportHelperBuilder.addMethod(supportHelperInject);
 
             JavaFile javaFile = JavaFile.builder(getPackageName(injectorsElement), supportBuilder.build())
                     .build();
 
+            JavaFile helperFile = JavaFile.builder(getPackageName(injectorsElement), supportHelperBuilder.build())
+                    .build();
+
             try {
                 javaFile.writeTo(processingEnv.getFiler());
+                helperFile.writeTo(processingEnv.getFiler());
             } catch (IOException e) {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "fail to write component file.", injectorsElement);
             }
@@ -251,6 +291,10 @@ public class DoublerProcessor extends AbstractProcessor {
 
     private String toSupportName(Element module) {
         return module.getSimpleName() + "Support";
+    }
+
+    private String toSupportHelperName(Element module) {
+        return module.getSimpleName() + "SupportHelper";
     }
 
     private String toModuleName(Element module) {
