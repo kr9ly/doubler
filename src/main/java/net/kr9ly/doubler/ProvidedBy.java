@@ -1,6 +1,4 @@
-package net.kr9ly.doubler.injectors;
-
-import net.kr9ly.doubler.InjectorsSupport;
+package net.kr9ly.doubler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,8 +20,8 @@ import java.lang.annotation.Target;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.TYPE)
-@InjectorsSupport
-public @interface SampleInjectors {
+public @interface ProvidedBy {
+    Class<? extends CustomProvider> value();
 }

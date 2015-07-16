@@ -13,7 +13,8 @@ maven { url 'http://kr9ly.github.io/maven/' }
 And Add this to `dependencies` block in your build.gradle
 
 ```
-apt 'net.kr9ly:doubler:0.0.2'
+compile 'net.kr9ly:doubler:0.1.0'
+apt 'net.kr9ly:doubler-compiler:0.1.0'
 ```
 
 ### Auto Module Expose Support
