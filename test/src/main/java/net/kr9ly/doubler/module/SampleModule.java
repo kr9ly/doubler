@@ -1,9 +1,9 @@
-package net.kr9ly.doubler;
+package net.kr9ly.doubler.module;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import dagger.Module;
+import dagger.Provides;
+import net.kr9ly.doubler.dynamic.SampleCustomProvider;
+import net.kr9ly.doubler.repository.SampleRepository;
 
 /**
  * Copyright 2015 kr9ly
@@ -20,7 +20,16 @@ import java.lang.annotation.Target;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.SOURCE)
-public @interface Assisted {
+@Module
+public class SampleModule {
+
+    @Provides
+    SampleRepository provideSampleRepository() {
+        return new SampleRepository();
+    }
+
+    @Provides
+    SampleCustomProvider provideSampleCustomProvider() {
+        return new SampleCustomProvider();
+    }
 }

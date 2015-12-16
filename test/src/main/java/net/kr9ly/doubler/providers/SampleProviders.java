@@ -1,4 +1,7 @@
-package net.kr9ly.doubler;
+package net.kr9ly.doubler.providers;
+
+import net.kr9ly.doubler.ProvidersSupport;
+import net.kr9ly.doubler.scope.SampleScope;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,7 +23,9 @@ import java.lang.annotation.Target;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Target(ElementType.ANNOTATION_TYPE)
+@SampleScope
 @Retention(RetentionPolicy.SOURCE)
-public @interface InjectorsSupport {
+@Target(ElementType.TYPE)
+@ProvidersSupport
+public @interface SampleProviders {
 }

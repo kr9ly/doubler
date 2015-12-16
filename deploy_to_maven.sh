@@ -1,9 +1,6 @@
-./gradlew uploadArchives
-cp -rf ./build/maven/ $CIRCLE_ARTIFACTS/maven/
 git clone "https://github.com/kr9ly/maven" /tmp/maven
+./gradlew uploadArchives
 cd /tmp/maven
-git checkout gh-pages
-cp -rf ${HOME}/doubler/build/maven/net /tmp/maven
 if [[ $(git status --porcelain) ]];
 then
 	echo "start deploying.";

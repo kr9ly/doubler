@@ -1,9 +1,10 @@
-package net.kr9ly.doubler;
+package net.kr9ly.doubler.repository;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.kr9ly.doubler.ProvidedBy;
+import net.kr9ly.doubler.dynamic.SampleCustomProvider;
+import net.kr9ly.doubler.providers.SampleProviders;
+
+import javax.inject.Inject;
 
 /**
  * Copyright 2015 kr9ly
@@ -20,7 +21,14 @@ import java.lang.annotation.Target;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Target(ElementType.ANNOTATION_TYPE)
-@Retention(RetentionPolicy.SOURCE)
-public @interface ProvidersSupport {
+@SampleProviders
+@ProvidedBy(SampleCustomProvider.class)
+public class SampleFieldInjectRepository {
+
+    @Inject
+    SampleRepository sampleRepository;
+
+    public String getString() {
+        return sampleRepository.getString() + "_field";
+    }
 }

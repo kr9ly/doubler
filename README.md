@@ -13,8 +13,8 @@ maven { url 'http://kr9ly.github.io/maven/' }
 And Add this to `dependencies` block in your build.gradle
 
 ```
-compile 'net.kr9ly:doubler:0.1.0'
-apt 'net.kr9ly:doubler-compiler:0.1.0'
+compile 'net.kr9ly:doubler:0.9.0'
+apt 'net.kr9ly:doubler-compiler:0.9.0'
 ```
 
 ### Auto Module Expose Support
@@ -97,23 +97,23 @@ public class SampleDependentRepository {
 @SampleProviders
 public class SampleDependentAssistedRepository {
 
-    private SampleDependentRepository sampleDependentRepository;
+    private SampleDependentRepository sampleFieldInjectRepository;
 
     private String suffix;
 
     // constructor injection
     @javax.inject.Inject
     public SampleDependentAssistedRepository(
-            SampleDependentRepository sampleDependentRepository,
+            SampleDependentRepository sampleFieldInjectRepository,
             // support assisted injection
             @net.kr9ly.doubler.Assisted String suffix
     ) {
-        this.sampleDependentRepository = sampleDependentRepository;
+        this.sampleFieldInjectRepository = sampleFieldInjectRepository;
         this.suffix = suffix;
     }
 
     public String getDependentAssistedString() {
-        return sampleDependentRepository.getDependentString() + suffix;
+        return sampleFieldInjectRepository.getDependentString() + suffix;
     }
 }
 ```
@@ -123,7 +123,7 @@ public class SampleDependentAssistedRepository {
 @dagger.Component(modules = {SampleProvidersModule.class})
 public interface SampleComponent extends SampleProvidersModuleSupport {
     // this method contained within SampleProvidersModuleSupport(Auto-Generated).
-    SampleDependentRepository sampleDependentRepository();
+    SampleDependentRepository sampleFieldInjectRepository();
     // you can inject Builder Class(Auto-Injected) also
     SampleDependentRepositoryBuilder sampleDependentRepositoryBuilder();
     // use SampleDependentAssistedRepositoryBuilder#build(String suffix) to get instance
