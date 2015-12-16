@@ -1,0 +1,3 @@
+rootProject.name = 'doubler'
+
+include 'core', 'compiler', 'test'

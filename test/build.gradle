@@ -1,0 +1,42 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+archivesBaseName = "doubler-test"
+
+ext {
+    generatedSourcesDir = file("${buildDir}/generated/java")
+}
+
+compileJava {
+    doFirst {
+        generatedSourcesDir.mkdirs()
+    }
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-source', '1.6', '-target', '1.6', '-s', generatedSourcesDir]
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':compiler')
+    compile 'com.google.dagger:dagger-compiler:2.0'
+    testCompile 'junit:junit:4.11'
+}
+
+idea {
+    module {
+        sourceDirs += generatedSourcesDir
+        generatedSourceDirs += generatedSourcesDir
+        excludeDirs = [
+                file("${projectDir}/build/classes"),
+                file("${projectDir}/build/reports"),
+                file("${projectDir}/build/resources"),
+                file("${projectDir}/build/test-results"),
+                file("${projectDir}/build/tmp"),
+                file("${projectDir}/build/dependency-cache"),
+        ]
+    }
+}

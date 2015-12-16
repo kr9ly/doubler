@@ -1,0 +1,4 @@
+subprojects {
+    group = 'net.kr9ly'
+    version = '0.9.0'
+}

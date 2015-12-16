@@ -1,0 +1,27 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.6
+archivesBaseName = "doubler"
+
+
+ext {
+    mavenRepository = getProperty("maven.repopath")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.auto.service:auto-service:1.0-rc2'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri(mavenRepository))
+        }
+    }
+}
