@@ -1,6 +1,6 @@
 machine:
   java:
-    version: openjdk7
+    version: oraclejdk8
 checkout:
   post:
     - echo "maven.repopath=/tmp/maven" > ./gradle.properties

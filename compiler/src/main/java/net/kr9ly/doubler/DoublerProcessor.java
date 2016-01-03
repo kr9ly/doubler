@@ -32,7 +32,7 @@ import java.util.Set;
  */
 @AutoService(Processor.class)
 @SupportedAnnotationTypes({"dagger.Module", "net.kr9ly.*"})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class DoublerProcessor extends AbstractProcessor {
 
     @Override
@@ -40,6 +40,8 @@ public class DoublerProcessor extends AbstractProcessor {
         generateProvidersComponents(roundEnv);
         generateInjectorsComponents(roundEnv);
         generateExposeComponents(roundEnv);
+        generateExposeHelpers(roundEnv);
+        generateInjectorsHelpers(roundEnv);
         return false;
     }
 
@@ -65,26 +67,72 @@ public class DoublerProcessor extends AbstractProcessor {
         }
     }
 
+    private void generateExposeHelpers(RoundEnvironment roundEnv) {
+        Set<? extends Element> exposes = roundEnv.getElementsAnnotatedWith(ExposeHelper.class);
+        for (Element expose : exposes) {
+            ExposeHelperClassBuilder builder = new ExposeHelperClassBuilder(processingEnv, expose);
+
+            for (Element member : expose.getEnclosedElements()) {
+                if (member.getKind() == ElementKind.METHOD) {
+                    builder.addExposeCode((ExecutableElement) member);
+                }
+            }
+
+            builder.buildExposeMethod();
+
+            JavaFile javaFile = JavaFile.builder(SpecHelper.getPackageName(processingEnv, expose), builder.build())
+                    .build();
+
+            try {
+                javaFile.writeTo(processingEnv.getFiler());
+            } catch (IOException e) {
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "fail to write component file.", expose);
+            }
+        }
+    }
+
     private void generateInjectorsComponents(RoundEnvironment roundEnv) {
         Set<? extends Element> injectorsElements = roundEnv.getElementsAnnotatedWith(InjectorsSupport.class);
         for (Element injectorsElement : injectorsElements) {
             InjectorsSupportInterfaceBuilder supportBuilder = new InjectorsSupportInterfaceBuilder(processingEnv, injectorsElement);
-            InjectorsSupportHelperClassBuilder supportHelperBuilder = new InjectorsSupportHelperClassBuilder(processingEnv, injectorsElement);
 
             Set<? extends Element> injectClasses = roundEnv.getElementsAnnotatedWith((TypeElement) injectorsElement);
             for (Element injectClass : injectClasses) {
                 supportBuilder.addInjectMethod(injectClass);
-                supportHelperBuilder.addInjectCode(injectClass);
             }
 
-            supportHelperBuilder.buildInjectMethod();
-
             JavaFile javaFile = JavaFile.builder(SpecHelper.getPackageName(processingEnv, injectorsElement), supportBuilder.build()).build();
-            JavaFile helperFile = JavaFile.builder(SpecHelper.getPackageName(processingEnv, injectorsElement), supportHelperBuilder.build()).build();
 
             try {
                 javaFile.writeTo(processingEnv.getFiler());
-                helperFile.writeTo(processingEnv.getFiler());
+            } catch (IOException e) {
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "fail to write component file.", injectorsElement);
+            }
+        }
+    }
+
+    private void generateInjectorsHelpers(RoundEnvironment roundEnv) {
+        Set<? extends Element> injectorsElements = roundEnv.getElementsAnnotatedWith(InjectorsHelper.class);
+        for (Element injectorsElement : injectorsElements) {
+            InjectorsSupportHelperClassBuilder builder = new InjectorsSupportHelperClassBuilder(processingEnv, injectorsElement);
+
+            for (Element member : injectorsElement.getEnclosedElements()) {
+                if (member.getKind() == ElementKind.METHOD) {
+                    builder.addInjectCode((ExecutableElement) member);
+                }
+            }
+
+            if (!injectorsElement.getEnclosedElements().isEmpty()) {
+                builder.closeInjectControlFlow();
+            }
+
+            builder.buildInjectMethod();
+
+            JavaFile javaFile = JavaFile.builder(SpecHelper.getPackageName(processingEnv, injectorsElement), builder.build())
+                    .build();
+
+            try {
+                javaFile.writeTo(processingEnv.getFiler());
             } catch (IOException e) {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "fail to write component file.", injectorsElement);
             }

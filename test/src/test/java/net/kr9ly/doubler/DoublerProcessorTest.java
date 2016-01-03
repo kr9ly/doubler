@@ -4,6 +4,8 @@ import net.kr9ly.doubler.component.DaggerSampleComponent;
 import net.kr9ly.doubler.component.SampleComponent;
 import net.kr9ly.doubler.injectors.SampleInjectorsSupportHelper;
 import net.kr9ly.doubler.module.SampleModule;
+import net.kr9ly.doubler.providers.SampleProvidersModuleSupportHelper;
+import net.kr9ly.doubler.repository.SampleInterface1;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -47,5 +49,6 @@ public class DoublerProcessorTest {
         assertEquals("sample", sampleModel2.getString());
         assertEquals("interface1", sampleModel2.getInterface1String());
         assertEquals("interface2", sampleModel2.getInterface2String());
+        assertEquals("interface1", SampleProvidersModuleSupportHelper.get(component, SampleInterface1.class).getString());
     }
 }

@@ -1,9 +1,6 @@
 package net.kr9ly.doubler.model;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import net.kr9ly.doubler.SpecHelper;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -12,7 +9,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 
 /**
- * Copyright 2015 kr9ly
+ * Copyright 2016 kr9ly
  * <br />
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +23,7 @@ import javax.lang.model.element.Modifier;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class InjectorsSupportHelperClassBuilder {
+public class ExposeHelperClassBuilder {
 
     private ProcessingEnvironment processingEnv;
 
@@ -34,51 +31,51 @@ public class InjectorsSupportHelperClassBuilder {
 
     private TypeSpec.Builder classBuilder;
 
-    private MethodSpec.Builder injectMethodBuilder;
+    private MethodSpec.Builder getMethodBuilder;
 
-    private CodeBlock.Builder injectMethodCodeBlockBuilder;
+    private CodeBlock.Builder getMethodCodeBlockBuilder;
 
     private boolean isFirst = true;
 
-    public InjectorsSupportHelperClassBuilder(ProcessingEnvironment processingEnv, Element injectorsElement) {
+    public ExposeHelperClassBuilder(ProcessingEnvironment processingEnv, Element exposeElement) {
         this.processingEnv = processingEnv;
 
-        className = ClassName.bestGuess(SpecHelper.getPackageName(processingEnv, injectorsElement) + "." + injectorsElement.getSimpleName());
+        className = ClassName.bestGuess(SpecHelper.getPackageName(processingEnv, exposeElement) + "." + exposeElement.getSimpleName());
 
-        classBuilder = TypeSpec.classBuilder(toHelperName(injectorsElement))
+        classBuilder = TypeSpec.classBuilder(toHelperName(exposeElement))
                 .addAnnotation(SpecHelper.getGeneratedAnnotation())
                 .addModifiers(Modifier.PUBLIC);
 
-        injectMethodBuilder = MethodSpec.methodBuilder("inject")
+        getMethodBuilder = MethodSpec.methodBuilder("get")
                 .addModifiers(Modifier.STATIC, Modifier.PUBLIC);
 
-        injectMethodCodeBlockBuilder = CodeBlock.builder();
+        getMethodCodeBlockBuilder = CodeBlock.builder();
     }
 
-    public void addInjectCode(ExecutableElement injectClass) {
+    public void addExposeCode(ExecutableElement exposeMethod) {
         if (isFirst) {
-            injectMethodCodeBlockBuilder
-                    .beginControlFlow("if (injectTo instanceof $T)", injectClass.getParameters().get(0).asType());
+            getMethodCodeBlockBuilder
+                    .beginControlFlow("if (clazz == $T.class)", exposeMethod.getReturnType());
             isFirst = false;
         } else {
-            injectMethodCodeBlockBuilder
-                    .nextControlFlow("else if (injectTo instanceof $T)", injectClass.getParameters().get(0).asType());
+            getMethodCodeBlockBuilder
+                    .nextControlFlow("else if (clazz == $T.class)", exposeMethod.getReturnType());
         }
-        injectMethodCodeBlockBuilder
-                .addStatement("component.inject(($T) injectTo)", injectClass.getParameters().get(0).asType());
+        getMethodCodeBlockBuilder
+                .addStatement("return (T) component.$L()", exposeMethod.getSimpleName());
     }
 
-    public void closeInjectControlFlow() {
-        injectMethodCodeBlockBuilder
-                .endControlFlow();
-    }
-
-    public void buildInjectMethod() {
+    public void buildExposeMethod() {
         classBuilder.addMethod(
-                injectMethodBuilder
+                getMethodBuilder
+                        .addTypeVariable(TypeVariableName.get("T"))
+                        .returns(TypeVariableName.get("T").box())
                         .addParameter(className.box(), "component")
-                        .addParameter(Object.class, "injectTo")
-                        .addCode(injectMethodCodeBlockBuilder.build())
+                        .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T").box()), "clazz")
+                        .addCode(getMethodCodeBlockBuilder
+                                .endControlFlow()
+                                .addStatement("return null")
+                                .build())
                         .build()
         );
     }

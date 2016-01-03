@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import net.kr9ly.doubler.InjectorsHelper;
 import net.kr9ly.doubler.SpecHelper;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -39,6 +40,7 @@ public class InjectorsSupportInterfaceBuilder {
         className = ClassName.bestGuess(SpecHelper.getPackageName(processingEnv, injectorsElement) + "." + toSupportName(injectorsElement));
 
         classBuilder = TypeSpec.interfaceBuilder(className.simpleName())
+                .addAnnotation(InjectorsHelper.class)
                 .addAnnotation(SpecHelper.getGeneratedAnnotation())
                 .addModifiers(Modifier.PUBLIC);
     }

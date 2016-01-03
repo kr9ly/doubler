@@ -3,6 +3,7 @@ package net.kr9ly.doubler.model;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import net.kr9ly.doubler.ExposeHelper;
 import net.kr9ly.doubler.SpecHelper;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -36,6 +37,7 @@ public class ExposeSupportInterfaceBuilder {
         this.processingEnv = processingEnv;
         classBuilder = TypeSpec.interfaceBuilder(toSupportName(moduleElement))
                 .addAnnotation(SpecHelper.getGeneratedAnnotation())
+                .addAnnotation(ExposeHelper.class)
                 .addModifiers(Modifier.PUBLIC);
     }
 
