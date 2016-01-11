@@ -1,6 +1,8 @@
 package net.kr9ly.doubler;
 
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -8,6 +10,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -44,12 +47,15 @@ public class SpecHelper {
     }
 
     public static AnnotationValue getAnnotationValue(Element elem, Class<? extends Annotation> action) {
-        String actionName = action.getName();
+        return getAnnotationValue(elem, action.getName(), "value");
+    }
+
+    public static AnnotationValue getAnnotationValue(Element elem, String annotationClassName, String valueName) {
         for (AnnotationMirror am : elem.getAnnotationMirrors()) {
-            if (actionName.equals(
+            if (annotationClassName.equals(
                     am.getAnnotationType().toString())) {
                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : am.getElementValues().entrySet()) {
-                    if ("value".equals(
+                    if (valueName.equals(
                             entry.getKey().getSimpleName().toString())) {
                         return entry.getValue();
                     }
@@ -57,6 +63,15 @@ public class SpecHelper {
             }
         }
         return null;
+    }
+
+    public static TypeName getTypeName(Object classObjectOrString) {
+        if (classObjectOrString instanceof String) {
+            return ClassName.bestGuess((String) classObjectOrString);
+        } else if (classObjectOrString instanceof DeclaredType) {
+            return TypeName.get((DeclaredType) classObjectOrString);
+        }
+        return ClassName.get((Class<?>) classObjectOrString);
     }
 
     public static boolean hasAnnotation(Element elem, Class<? extends Annotation> action) {

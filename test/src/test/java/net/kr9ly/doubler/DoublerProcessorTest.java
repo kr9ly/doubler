@@ -50,5 +50,6 @@ public class DoublerProcessorTest {
         assertEquals("interface1", sampleModel2.getInterface1String());
         assertEquals("interface2", sampleModel2.getInterface2String());
         assertEquals("interface1", SampleProvidersModuleSupportHelper.get(component, SampleInterface1.class).getString());
+        assertEquals("providedAs", sampleModel2.getProvidedAsString());
     }
 }

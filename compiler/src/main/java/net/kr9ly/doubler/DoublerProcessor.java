@@ -148,7 +148,7 @@ public class DoublerProcessor extends AbstractProcessor {
             for (Element provideClass : provideClasses) {
                 ProvideBuilderClassBuilder builderClassBuilder = new ProvideBuilderClassBuilder(processingEnv, provideClass);
 
-                moduleBuilder.beginProvideMethod(provideClass);
+                moduleBuilder.beginProvideMethod(provideClass, providersElement);
                 moduleBuilder.beginProvideBuilderMethod(provideClass);
 
                 for (AnnotationMirror annotation : providersElement.getAnnotationMirrors()) {

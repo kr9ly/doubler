@@ -1,6 +1,7 @@
 package net.kr9ly.doubler;
 
 import net.kr9ly.doubler.injectors.SampleInjectors;
+import net.kr9ly.doubler.repository.ProvidedAsSampleInterface;
 import net.kr9ly.doubler.repository.SampleInterface1;
 import net.kr9ly.doubler.repository.SampleInterface2;
 import net.kr9ly.doubler.repository.SampleRepository;
@@ -34,6 +35,9 @@ public class SampleModel2 {
     @Inject
     SampleInterface2 sampleInterface2;
 
+    @Inject
+    ProvidedAsSampleInterface sampleProvidedAs;
+
     public String getString() {
         return sampleRepository.getString();
     }
@@ -44,5 +48,9 @@ public class SampleModel2 {
 
     public String getInterface2String() {
         return sampleInterface2.getString();
+    }
+
+    public String getProvidedAsString() {
+        return sampleProvidedAs.getString();
     }
 }

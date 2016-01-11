@@ -8,8 +8,6 @@ import net.kr9ly.doubler.SpecHelper;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
-import javax.lang.model.type.MirroredTypeException;
-import java.util.List;
 
 /**
  * Copyright 2015 kr9ly
@@ -47,11 +45,21 @@ public class ProvidersModuleClassBuilder {
                 .addModifiers(Modifier.PUBLIC);
     }
 
-    public void beginProvideMethod(Element provideClass) {
+    public void beginProvideMethod(Element provideClass, Element providersElement) {
         builderName = ClassName.bestGuess(SpecHelper.getPackageName(processingEnv, provideClass) + "." + toBuilderName(provideClass));
 
+        String providersClassName = SpecHelper.getPackageName(processingEnv, providersElement) + "." + providersElement.getSimpleName();
+        AnnotationValue as = SpecHelper.getAnnotationValue(provideClass, providersClassName, "as");
+
+        TypeName provideAs;
+        if (as == null || as.getValue() == Void.class) {
+            provideAs = TypeName.get(provideClass.asType());
+        } else {
+            provideAs = SpecHelper.getTypeName(as.getValue());
+        }
+
         provideMethodBuilder = MethodSpec.methodBuilder(toProvidesMethodName(provideClass.getSimpleName().toString()))
-                .returns(TypeName.get(provideClass.asType()))
+                .returns(provideAs)
                 .addStatement("$T builder = new $T()", builderName.box(), builderName.box())
                 .addAnnotation(Provides.class)
                 .addModifiers(Modifier.PUBLIC);
@@ -101,7 +109,7 @@ public class ProvidersModuleClassBuilder {
         AnnotationValue annotationValue = SpecHelper.getAnnotationValue(provideClass, ProvidedBy.class);
         provideMethodBuilder
                 .addCode(getProviderCodeBlock())
-                .addParameter(ParameterSpec.builder(ClassName.bestGuess(annotationValue.getValue().toString()), "__provider").build());
+                .addParameter(ParameterSpec.builder(SpecHelper.getTypeName(annotationValue.getValue()), "__provider").build());
     }
 
     public TypeSpec build() {

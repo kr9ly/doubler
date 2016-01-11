@@ -1,15 +1,9 @@
-package net.kr9ly.doubler.providers;
+package net.kr9ly.doubler.repository;
 
-import net.kr9ly.doubler.ProvidersSupport;
-import net.kr9ly.doubler.scope.SampleScope;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.kr9ly.doubler.providers.SampleProviders;
 
 /**
- * Copyright 2015 kr9ly
+ * Copyright 2016 kr9ly
  * <br />
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +17,12 @@ import java.lang.annotation.Target;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@SampleScope
-@Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.TYPE)
-@ProvidersSupport
-public @interface SampleProviders {
 
-    Class<?> as() default Void.class;
+@SampleProviders(as = ProvidedAsSampleInterface.class)
+public class ProvidedAsSampleRepository implements ProvidedAsSampleInterface {
+
+    @Override
+    public String getString() {
+        return "providedAs";
+    }
 }
